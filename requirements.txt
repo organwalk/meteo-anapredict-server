@@ -1,0 +1,7 @@
+pandas
+pymysql
+nacos-sdk-python
+flask
+flask-cors
+tensorFlow
+keras
