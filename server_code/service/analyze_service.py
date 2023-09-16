@@ -4,9 +4,11 @@
 """
 from server_code.analyze import meteo_data_analyze
 from server_code.repository import repository
+from typing import List, Optional
 
 
-def get_correlation_list(station: str, start_date: str, end_date: str, correlation: str):
+def get_correlation_list(station: str, start_date: str, end_date: str, correlation: str)\
+        -> Optional[List[List[float]]]:
     """
     获取计算后的协相关矩阵
 
@@ -15,7 +17,7 @@ def get_correlation_list(station: str, start_date: str, end_date: str, correlati
     :param end_date: 结束日期
     :param correlation: 需要进行相关系数矩阵计算的气象要素
     :return:
-        list or None: 返回计算结果二维数组，如果计算失败则返回None
+        [List[List[float]]] or None: 返回计算结果二维数组，如果计算失败则返回None
 
     by organwalk 2023-08-20
     """

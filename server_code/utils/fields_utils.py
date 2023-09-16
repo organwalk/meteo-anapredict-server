@@ -4,10 +4,12 @@
 """
 import re
 from server_code.repository import repository
+from server_code.config.application import SHORT_TERM_MODEL_LIST, LONG_TERM_MODEL_LIST
 from datetime import datetime, timedelta
+from typing import Union, Dict
 
 
-def validate_station(station: str):
+def validate_station(station: str) -> Union[str, Dict[str, str]]:
     """
     校验气象站编号字段的正确性
 
@@ -17,10 +19,10 @@ def validate_station(station: str):
 
     by organwalk 2023-08-15
     """
-    return station if isinstance(station, str) else __get_error_msg("station字段需要字符串类型的气象站编号")
+    return station if isinstance(station, str) else _get_error_msg("station字段需要字符串类型的气象站编号")
 
 
-def validate_date(station: str, date: str):
+def validate_date(station: str, date: str) -> Union[str, Dict[str, str]]:
     """
     校验起始日期和截止日期的有效性
     :param station: 气象站编号
@@ -34,12 +36,12 @@ def validate_date(station: str, date: str):
         if repository.validate_station_date(station, date) > 0:
             return date
         else:
-            return __get_error_msg(f"值为{date}的date相关字段，其日期下不存在有效数据，请重新指定")
+            return _get_error_msg(f"值为{date}的date相关字段，其日期下不存在有效数据，请重新指定")
     else:
-        return __get_error_msg("date相关字段需要YYYY-MM-DD格式字符串")
+        return _get_error_msg("date相关字段需要YYYY-MM-DD格式字符串")
 
 
-def validate_which_or_correlation(elements: str):
+def validate_which_or_correlation(elements: str) -> Union[str, Dict[str, str]]:
     """
     校验气象要素的正确性
 
@@ -53,10 +55,10 @@ def validate_which_or_correlation(elements: str):
         numbers = [int(num) for num in elements.split(',') if num.isdigit()]
         if all(1 <= num <= 8 for num in numbers):
             return elements
-    return __get_error_msg("气象要素相关字段需要以英文逗号分割的数字字符串格式数据，例如：1,2,3,范围在1-8")
+    return _get_error_msg("气象要素相关字段需要以英文逗号分割的数字字符串格式数据，例如：1,2,3,范围在1-8")
 
 
-def validate_model_type(model_type: str):
+def validate_model_type(model_type: str) -> Union[str, Dict[str, str]]:
     """
     校验模型类型的正确性
 
@@ -66,25 +68,14 @@ def validate_model_type(model_type: str):
 
     by organwalk 2023-08-20
     """
-    short_term_list = [
-        'SHORTTERM_LSTM',
-        'SHORTTERM_ARIMA',
-        'SHORTTERM_PROPHET',
-        'SHORTTERM_MIXED'
-    ]
-    long_term_list = [
-        'LONGTERM_LSTM',
-        'LONGTERM_ARIMA',
-        'LONGTERM_PROPHET',
-        'LONGTERM_MIXED'
-    ]
-    if isinstance(model_type, str) and (model_type in short_term_list or model_type in long_term_list):
+
+    if isinstance(model_type, str) and (model_type in SHORT_TERM_MODEL_LIST or model_type in LONG_TERM_MODEL_LIST):
         return model_type
     else:
-        return __get_error_msg("model_type是字符串类型数据，其具体值已在接口文档中定义，请输入接口文档定义值")
+        return _get_error_msg("model_type是字符串类型数据，其具体值已在接口文档中定义，请输入接口文档定义值")
 
 
-def validate_five_day_date_range(start_date: str, end_date: str):
+def validate_five_day_date_range(start_date: str, end_date: str) -> bool:
     """
     校验日期范围是否大于等于五天
 
@@ -99,7 +90,7 @@ def validate_five_day_date_range(start_date: str, end_date: str):
     return True if date_diff >= timedelta(days=5) else False
 
 
-def __get_error_msg(msg: str):
+def _get_error_msg(msg: str) -> dict:
     """
     返回字典形式的错误消息
 

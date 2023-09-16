@@ -6,18 +6,18 @@ from collections import OrderedDict
 from flask import Response
 import json
 
-__SUCCESS_CODE = 200
-__NOT_FOUND_CODE = 404
-__ERROR_CODE = 500
-__FAIL_ENTITY_CODE = 422
-__FAIL_METHOD_CODE = 405
+_SUCCESS_CODE = 200
+_NOT_FOUND_CODE = 404
+_ERROR_CODE = 500
+_FAIL_ENTITY_CODE = 422
+_FAIL_METHOD_CODE = 405
 
 
-def success(msg, data):
+def success(msg: str, data: any) -> Response:
     return Response(
         json.dumps(
             OrderedDict([
-                ('code', __SUCCESS_CODE),
+                ('code', _SUCCESS_CODE),
                 ('msg', msg),
                 ('data', data)
             ])
@@ -26,11 +26,11 @@ def success(msg, data):
     )
 
 
-def not_found(msg):
+def not_found(msg: str) -> Response:
     return Response(
         json.dumps(
             OrderedDict([
-                ('code', __NOT_FOUND_CODE),
+                ('code', _NOT_FOUND_CODE),
                 ('msg', msg)
             ])
         ),
@@ -38,11 +38,11 @@ def not_found(msg):
     )
 
 
-def error(msg):
+def error(msg: str) -> Response:
     return Response(
         json.dumps(
             OrderedDict([
-                ('code', __ERROR_CODE),
+                ('code', _ERROR_CODE),
                 ('msg', msg)
             ])
         ),
@@ -50,11 +50,11 @@ def error(msg):
     )
 
 
-def fail_entity(msg):
+def fail_entity(msg: str) -> Response:
     return Response(
         json.dumps(
             OrderedDict([
-                ('code', __FAIL_ENTITY_CODE),
+                ('code', _FAIL_ENTITY_CODE),
                 ('msg', msg)
             ])
         ),
@@ -62,11 +62,11 @@ def fail_entity(msg):
     )
 
 
-def fail_method(msg):
+def fail_method(msg: str) -> Response:
     return Response(
         json.dumps(
             OrderedDict([
-                ('code', __FAIL_METHOD_CODE),
+                ('code', _FAIL_METHOD_CODE),
                 ('msg', msg)
             ])
         ),

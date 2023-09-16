@@ -3,16 +3,17 @@
     by organwalk 2023-08-20
 """
 import pandas as pd
+from typing import List, Optional
 
 
-def calculate_correlation_matrix(elements: str, merged_data: pd.DataFrame):
+def calculate_correlation_matrix(elements: str, merged_data: pd.DataFrame) -> Optional[List]:
     """
     计算协相关矩阵
 
     :param elements: 需要进行计算的气象要素
     :param merged_data: 连续时间段CSV合并数据
     :return:
-        list: 协相关矩阵的二维数组
+        list or None: 协相关矩阵的二维数组, 计算结果为空时返回None
 
     by organwalk 2023-08-20
     """

@@ -3,9 +3,10 @@
     by organwalk 2023-08-15
 """
 from server_code.utils import fields_utils
+from typing import Optional
 
 
-def validate_json_user_req(api: str, user_req_json: dict, server_req_fields: list):
+def validate_json_user_req(api: str, user_req_json: dict, server_req_fields: list) -> Optional[str]:
     """
     校验调用方请求中的 JSON 数据
 
@@ -22,19 +23,19 @@ def validate_json_user_req(api: str, user_req_json: dict, server_req_fields: lis
         return '调用方未能正确传递JSON格式数据'
 
     # 1.检验JSON格式数据是否存在空缺值
-    missing_check = __validate_json_missing(user_req_json, server_req_fields)
+    missing_check = _validate_json_missing(user_req_json, server_req_fields)
     if missing_check:
         return f'调用方传递JSON格式数据存在空缺值，提示消息如下：{missing_check}'
 
     # 2.检验对应接口的JSON格式数据其值类型与格式是否正确
-    error_msg = __validate_json_value(user_req_json, api)
+    error_msg = _validate_json_value(user_req_json, api)
     if error_msg is not None:
         return f'调用方传递JSON格式数据存在错误，提示消息如下：{error_msg}'
 
     return None
 
 
-def __validate_json_missing(user_req_json: dict, server_req_fields: list):
+def _validate_json_missing(user_req_json: dict, server_req_fields: list) -> Optional[str]:
     """
     校验调用方请求中的 JSON 数据是否含有空缺值
 
@@ -52,7 +53,7 @@ def __validate_json_missing(user_req_json: dict, server_req_fields: list):
     return None
 
 
-def __validate_json_value(user_req_json: dict, api: str):
+def _validate_json_value(user_req_json: dict, api: str) -> Optional[str]:
     """
     校验调用方JSON数据的类型与格式是否正确
 
@@ -64,14 +65,14 @@ def __validate_json_value(user_req_json: dict, api: str):
     by organwalk 2023-08-15
     """
     if api == '/anapredict/analyze/correlation':
-        return __validate_api_correlation(user_req_json)
+        return _validate_api_correlation(user_req_json)
     if api == '/anapredict/model/prediction':
-        return __validate_api_prediction(user_req_json)
+        return _validate_api_prediction(user_req_json)
     else:
         return None
 
 
-def __validate_api_correlation(user_req_json: dict):
+def _validate_api_correlation(user_req_json: dict) -> Optional[str]:
     """
     校验/anapredict/analyze/correlation接口的JSON数据
 
@@ -94,7 +95,7 @@ def __validate_api_correlation(user_req_json: dict):
     return '；'.join(set(msg_list)) if msg_list else None
 
 
-def __validate_api_prediction(user_req_json: dict):
+def _validate_api_prediction(user_req_json: dict) -> Optional[str]:
     """
     校验/anapredict/model/prediction接口的JSON数据
 

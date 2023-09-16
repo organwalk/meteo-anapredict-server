@@ -10,14 +10,14 @@ from server_code.repository import repository
 import entity.req_entity as server_req
 from utils import req_utils
 from service import analyze_service
-
+from service.prediction_service import predict_by_model
 
 app = Flask(__name__)
 CORS(app)
 
 
 @app.route('/anapredict/model/info', methods=['GET'])
-def __api_model_info():
+def _api_model_info():
     """
     从数据库中获取并返回模型信息
 
@@ -31,7 +31,7 @@ def __api_model_info():
 
 
 @app.route('/anapredict/analyze/correlation', methods=['POST'])
-def __api_data_correlation():
+def _api_data_correlation():
     """
     对给定的要求进行气象数据分析
 
@@ -52,28 +52,30 @@ def __api_data_correlation():
 
 
 @app.route('/anapredict/model/prediction', methods=['POST'])
-def __api_model_prediction():
+def _api_model_prediction():
     validate = req_utils.validate_json_user_req('/anapredict/model/prediction',
                                                 request.get_json(),
                                                 server_req.PREDICTION)
     if validate is None:
-        return result.success('成功', request.get_json())
+        prediction_list = predict_by_model(**request.get_json())
+        return result.success('成功预测', prediction_list) if prediction_list is not None \
+            else result.error('预测过程中发生了错误，请稍后再试')
     else:
         return result.fail_entity(validate)
 
 
 @app.errorhandler(404)
-def __server_api_notfound(e):
+def _server_api_notfound(e):
     return result.not_found(f'{e.name},该接口不存在，请修改后重试')
 
 
 @app.errorhandler(405)
-def handle_method_not_allowed(e):
+def _handle_method_not_allowed(e):
     return result.fail_method(f"该接口仅支持 {', '.join([method for method in e.valid_methods if (method != 'OPTIONS')])} 方法")
 
 
 @app.errorhandler(500)
-def __server_error(e):
+def _server_error(e):
     return result.error(f'{e.name},内部服务处理错误')
 
 

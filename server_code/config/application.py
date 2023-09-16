@@ -9,9 +9,23 @@ import threading
 import time
 
 
-FILE_PATH = "C:/Users/haruki/PycharmProjects/lstm/data/"
+FILE_PATH = "C:/Users/haruki/PycharmProjects/meteo-anapredict-server/meteo_data_csv/"
 
-__MYSQL_CONFIG = {
+SHORT_TERM_MODEL_LIST = [
+    'SHORTTERM_LSTM',
+    'SHORTTERM_ARIMA',
+    'SHORTTERM_PROPHET',
+    'SHORTTERM_MIXED'
+    ]
+
+LONG_TERM_MODEL_LIST = [
+    'LONGTERM_LSTM',
+    'LONGTERM_ARIMA',
+    'LONGTERM_PROPHET',
+    'LONGTERM_MIXED'
+]
+
+_MYSQL_CONFIG = {
     'host': 'localhost',
     'user': 'root',
     'password': '123456',
@@ -28,11 +42,11 @@ def get_mysql_obj():
 
     by organwalk 2023-08-15
     """
-    cnx = pymysql.connect(**__MYSQL_CONFIG)
+    cnx = pymysql.connect(**_MYSQL_CONFIG)
     return cnx.cursor()
 
 
-__NACOS_CONFIG = OrderedDict([
+_NACOS_CONFIG = OrderedDict([
     ('service_name', 'meteo-anapredict-resource'),
     ('ip', 'localhost'),
     ('port', 9594),
@@ -40,7 +54,7 @@ __NACOS_CONFIG = OrderedDict([
 ])
 
 
-def register_to_nacos():
+def register_to_nacos() -> None:
     """
     注册服务至nacos
 
@@ -50,12 +64,12 @@ def register_to_nacos():
     by organwalk 2023-08-15
     """
     client = NacosClient('localhost:8848')
-    client.add_naming_instance(**__NACOS_CONFIG)
+    client.add_naming_instance(**_NACOS_CONFIG)
     heartbeat_thread = threading.Thread(target=__send_heartbeat_periodically, args=(client,), daemon=True)
     heartbeat_thread.start()
 
 
-def __send_heartbeat_periodically(client):
+def __send_heartbeat_periodically(client: NacosClient):
     """
     每十秒发送一次心跳至nacos
 
@@ -68,4 +82,4 @@ def __send_heartbeat_periodically(client):
     first_run = True
     while True:
         first_run = False if first_run else time.sleep(10)
-        client.send_heartbeat(**__NACOS_CONFIG)
+        client.send_heartbeat(**_NACOS_CONFIG)

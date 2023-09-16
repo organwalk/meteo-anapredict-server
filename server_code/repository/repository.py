@@ -3,9 +3,10 @@ from server_code.config.application import get_mysql_obj
 from server_code.config.application import FILE_PATH
 import server_code.repository.mysql_statements as mysql_statements
 import pandas as pd
+from typing import Union, List, Dict
 
 
-def get_model_info():
+def get_model_info() -> Union[Dict, List]:
     """
     获取模型信息
 
@@ -20,7 +21,7 @@ def get_model_info():
     return res_entity.set_model_info(*result) if result else []
 
 
-def validate_station_date(station: str, date: str):
+def validate_station_date(station: str, date: str) -> int:
     """
     校验指定气象站下的日期是否存在记录
 
@@ -36,7 +37,7 @@ def validate_station_date(station: str, date: str):
     return int(mysql.fetchall()[0][0])
 
 
-def get_merged_csv_data(station: str, start_date: str, end_date: str):
+def get_merged_csv_data(station: str, start_date: str, end_date: str) -> pd.DataFrame:
     """
     获取指定气象站点下起止日期连续时间段内的CSV数据
 
