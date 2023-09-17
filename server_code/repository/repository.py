@@ -4,6 +4,7 @@ from server_code.config.application import FILE_PATH
 import server_code.repository.mysql_statements as mysql_statements
 import pandas as pd
 from typing import Union, List, Dict
+from server_code.utils import data_utils
 
 
 def get_model_info() -> Union[Dict, List]:
@@ -39,7 +40,7 @@ def validate_station_date(station: str, date: str) -> int:
 
 def get_merged_csv_data(station: str, start_date: str, end_date: str) -> pd.DataFrame:
     """
-    获取指定气象站点下起止日期连续时间段内的CSV数据
+    获取指定气象站点下起止日期连续时间段内合并的CSV数据
 
     :param station: 气象站编号
     :param start_date: 起始日期
@@ -66,3 +67,17 @@ def get_merged_csv_data(station: str, start_date: str, end_date: str) -> pd.Data
             if previous_data is not None:
                 data_frames.append(previous_data.copy())
     return pd.concat(data_frames) if not date_range.empty else None
+
+
+def get_one_csv_data(station: str, date: str):
+    """
+    获取一份CSV数据集经过归一化处理后的数据窗
+    :param station: 气象站编号
+    :param date: 日期
+    :return:
+    """
+    file_path = f"{FILE_PATH}{station}_data_{date}"
+    df_file_data = pd.read_csv(file_path)
+    df_avg_data = data_utils.calculate_hour_avg(df_file_data)
+    df_scaler_data, scaler = data_utils.get_scaler_result(df_avg_data)
+    return df_scaler_data, scaler
