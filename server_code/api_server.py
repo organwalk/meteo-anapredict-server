@@ -2,7 +2,7 @@
     Flask应用接口服务，同时将服务注册到nacos中
     by organwalk 2023-08-15
 """
-from flask import Flask, request
+from flask import Flask, request, Response
 from flask_cors import CORS
 from server_code.config import result
 from config.application import register_to_nacos
@@ -17,12 +17,12 @@ CORS(app)
 
 
 @app.route('/anapredict/model/info', methods=['GET'])
-def _api_model_info():
+def _api_model_info() -> Response:
     """
     从数据库中获取并返回模型信息
 
     :return:
-        json: 根据获取状态返回相应的消息以及数据
+        Response: 根据获取状态返回相应的消息以及数据
 
     by organwalk 2023-08-15
     """
@@ -31,12 +31,12 @@ def _api_model_info():
 
 
 @app.route('/anapredict/analyze/correlation', methods=['POST'])
-def _api_data_correlation():
+def _api_data_correlation() -> Response:
     """
     对给定的要求进行气象数据分析
 
     :return:
-        json: 根据获取状态返回相应的消息以及数据
+        Response: 根据获取状态返回相应的消息以及数据
 
     by organwalk 2023-08-15
     """
@@ -52,7 +52,13 @@ def _api_data_correlation():
 
 
 @app.route('/anapredict/model/prediction', methods=['POST'])
-def _api_model_prediction():
+def _api_model_prediction() -> Response:
+    """
+    根据用户的配置信息进行模型预测
+
+    :return:
+        Response: 根据模型预测结果返回相应的消息以及数据
+    """
     validate = req_utils.validate_json_user_req('/anapredict/model/prediction',
                                                 request.get_json(),
                                                 server_req.PREDICTION)
