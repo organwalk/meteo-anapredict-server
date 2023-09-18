@@ -1,0 +1,44 @@
+"""
+    定义获取LSTM长短期模型预测结果的函数
+    by organwalk 2023-09-18
+"""
+from server_code.repository import repository
+from tensorflow.keras.models import load_model
+from server_code.config.application import MODEL_PATH
+import numpy as np
+from typing import List
+
+
+def get_short_term_predict(station: str, date: str) -> List[List[int]]:
+    """
+    获取LSTM短期模型的预测结果
+
+    :param station: 气象站编号
+    :param date: 日期
+    :return:
+        List[List[float]] or None: 返回值为二维数组的预测结果，无结果时返回None
+
+    by organwalk 2023-09-17
+    """
+    time_step = 24
+    feature = 8
+    # 0.获取归一化后的数据，及解归一化使用的scaler对象
+    df_data, scaler = repository.get_one_csv_data(station, date)
+    # 1.加载模型
+    model = load_model(f'{MODEL_PATH}/short_term/lstm.h5')
+    # 2.获取预测数据
+    # 2.1将输入数据窗转为numpy数组
+    input_data = np.array([df_data])
+    # 2.2根据时间步长、特征值划分numpy数组为输入序列
+    x_input = input_data.reshape((1, time_step, feature))
+    # 2.3使用模型获取预测结果
+    output_data = model.predict(x_input, verbose=0)
+    # 2.4整数化预测结果
+    int_output_data = np.round(output_data).astype(int)
+    # 2.5根据时间步长、特征值重塑数组形状，其中每个元素都被限制在0及以上
+    reshape_int_output_data = np.clip(int_output_data, a_min=0, a_max=None).reshape((time_step, feature))
+    # 2.6将预测结果解归一化
+    non_scaler_output = scaler.inverse_transform(reshape_int_output_data).reshape((time_step, feature))
+    # 2.7得到最终整数化的预测结果
+    predict_result = np.round(non_scaler_output).astype(int).tolist()
+    return predict_result

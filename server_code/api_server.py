@@ -3,7 +3,6 @@
     by organwalk 2023-08-15
 """
 from flask import Flask, request, Response
-from flask_cors import CORS
 from server_code.config import result
 from config.application import register_to_nacos
 from server_code.repository import repository
@@ -13,8 +12,6 @@ from service import analyze_service
 from service.prediction_service import predict_by_model
 
 app = Flask(__name__)
-CORS(app)
-
 
 @app.route('/anapredict/model/info', methods=['GET'])
 def _api_model_info() -> Response:
@@ -64,8 +61,7 @@ def _api_model_prediction() -> Response:
                                                 server_req.PREDICTION)
     if validate is None:
         prediction_list = predict_by_model(**request.get_json())
-        return result.success('成功预测', prediction_list) if prediction_list is not None \
-            else result.error('预测过程中发生了错误，请稍后再试')
+        return result.success('成功获取预测数据', prediction_list)
     else:
         return result.fail_entity(validate)
 

@@ -14,7 +14,6 @@ def calculate_hour_avg(df_data: pd.DataFrame) -> pd.DataFrame:
     """
     df_data['Time'] = pd.to_datetime(df_data['Time'])
     df = df_data.set_index('Time')
-
     df_hourly = df.resample('H').mean().round(2).reset_index().drop('Time', axis=1)
 
     return df_hourly.astype(int)
