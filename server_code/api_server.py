@@ -13,6 +13,7 @@ from service.prediction_service import predict_by_model
 
 app = Flask(__name__)
 
+
 @app.route('/anapredict/model/info', methods=['GET'])
 def _api_model_info() -> Response:
     """
@@ -55,6 +56,8 @@ def _api_model_prediction() -> Response:
 
     :return:
         Response: 根据模型预测结果返回相应的消息以及数据
+
+    by organwalk 2023-09-18
     """
     validate = req_utils.validate_json_user_req('/anapredict/model/prediction',
                                                 request.get_json(),

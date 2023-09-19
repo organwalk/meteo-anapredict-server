@@ -74,10 +74,12 @@ def get_merged_csv_data(station: str, start_date: str, end_date: str) -> pd.Data
 def get_one_csv_data(station: str, date: str) -> Tuple[pd.DataFrame, MinMaxScaler]:
     """
     获取一份CSV数据集经过归一化处理后的数据窗
+
     :param station: 气象站编号
     :param date: 日期
     :return:
         DataFrame and MinMaxScaler: 归一化后的数据窗以及解归一化需要使用的MinMaxScaler对象
+
     by organwalk 2023-09-17
     """
     file_path = f"{FILE_PATH}{station}_data_{date}.csv"
