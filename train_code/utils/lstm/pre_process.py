@@ -21,6 +21,7 @@ def split_short_term_sequences(station: str, start_date: str, end_date: str):
     x, y = list(), list()
     scaler = None
     for i in range(len(existing_files) - 1):
+        print(f"正在划分输入序列：{existing_files[i]}, 划分输出序列{existing_files[i + 1]}")
         # 读取当前和下一个数据
         df_current = pd.read_csv(existing_files[i])
         df_next = pd.read_csv(existing_files[i + 1])
