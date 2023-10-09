@@ -6,6 +6,7 @@ from typing import Union, List
 from server_code.config.application import FILE_PATH
 from datetime import datetime, timedelta
 import os
+import numpy as np
 import pandas as pd
 from typing import Tuple
 from train_code.utils import data_utils
@@ -68,5 +69,15 @@ def get_one_csv_data(station: str, date: str) -> Tuple[pd.DataFrame, MinMaxScale
     df_scaler_data, scaler = data_utils.get_scaler_result(df_avg_data)
     return df_scaler_data, scaler
 
+
+def get_one_csv_data_tolist(station: str, date: str) -> List[List[float]]:
+    file_path = f"{FILE_PATH}{station}_data_{date}.csv"
+    # 0. 将指定数据集读取为pandas数据窗
+    df_file_data = pd.read_csv(file_path)
+    # 1. 将数据窗的每个特征处理为保留小数点后两位的24小时平均值
+    df_avg_data = data_utils.calculate_hour_avg(df_file_data)
+    # 2. 返回二维数组
+    np_avg_data = np.round(df_avg_data.values).astype(float)
+    return np_avg_data.tolist()
 
 # print(get_csv('1', '2023-07-28', '2023-08-03'))
