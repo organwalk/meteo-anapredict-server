@@ -33,7 +33,7 @@ def build_short_term_model(input_seq: np.ndarray, output_seq: np.ndarray,
     # 1. 构建模型
     model = Sequential()
     # 1.1 LSTM层 -> 500个LSTM单元
-    model.add(LSTM(300, activation='relu', input_shape=(n_steps_in, n_features)))
+    model.add(LSTM(500, activation='relu', input_shape=(n_steps_in, n_features)))
     # 1.2 Droput正则化，减少过拟合风险
     model.add(Dropout(0.5))
     # 1.3 为每一个时间步创建一个预测

@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 from sklearn.preprocessing import MinMaxScaler
 from datetime import datetime
 
+
 def get_rmse(pred_result: List[List[float]], val_seq: List[List[float]]):
     """
     获取均方根误差：
