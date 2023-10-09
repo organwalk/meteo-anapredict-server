@@ -8,7 +8,6 @@ from sklearn.preprocessing import MinMaxScaler
 def calculate_hour_avg(df_data: pd.DataFrame) -> pd.DataFrame:
     """
     计算数据窗的每小时的平均结果
-
     :param df_data: pandas数据窗
     :return:
         DataFrame: 返回24小时的整数数据窗
@@ -26,7 +25,6 @@ def calculate_hour_avg(df_data: pd.DataFrame) -> pd.DataFrame:
 def get_scaler_result(df_data: pd.DataFrame) -> (pd.DataFrame, MinMaxScaler):
     """
     获取数据窗归一化后的结果
-
     :param df_data: pandas数据窗
     :return:
         DataFrame: 返回归一化后的数据及解归一化使用的scaler对象

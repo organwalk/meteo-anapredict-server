@@ -20,6 +20,8 @@ def get_csv(station: str, start_date: str, end_date: str) -> Union[List[str], st
     :param end_date: 结束日期
     :return:
         List[str] or AnyStr: 返回csv数据集文件路径列表，无法前向填充时返回错误消息
+
+    by organwalk 2023-09-17
     """
     start_date = datetime.strptime(start_date, "%Y-%m-%d")
     end_date = datetime.strptime(end_date, "%Y-%m-%d")
@@ -50,7 +52,6 @@ def get_csv(station: str, start_date: str, end_date: str) -> Union[List[str], st
 def get_one_csv_data(station: str, date: str) -> Tuple[pd.DataFrame, MinMaxScaler]:
     """
     获取一份CSV数据集经过归一化处理后的数据窗
-
     :param station: 气象站编号
     :param date: 日期
     :return:
