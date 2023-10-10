@@ -1,6 +1,6 @@
 from server_code.entity import res_entity
-from server_code.config.application import get_mysql_obj
-from server_code.config.application import FILE_PATH
+from server_code.application import get_mysql_obj
+from server_code.application import FILE_PATH
 import server_code.repository.mysql_statements as mysql_statements
 import pandas as pd
 from typing import Union, List, Dict

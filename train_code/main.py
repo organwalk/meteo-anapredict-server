@@ -55,4 +55,6 @@ def train_lstm_short_term():
     evalu.chart_compared(pred_result=predict_result, val_seq=nonscaler_val_seq)
 
 
-train_lstm_short_term()
+pre_lstm.split_long_term_sequences(station='1',
+                                   start_date='2023-06-27',
+                                   end_date='2023-07-20')

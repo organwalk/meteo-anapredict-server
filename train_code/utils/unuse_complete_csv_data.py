@@ -1,6 +1,7 @@
 import csv
 from datetime import datetime, timedelta
-import server_code.config.application as config
+from server_code import application as config
+
 input_file = config.FILE_PATH + '1_data_2023-07-03.csv'
 output_file = config.FILE_PATH + 'output.csv'
 

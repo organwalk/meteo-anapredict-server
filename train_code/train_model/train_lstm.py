@@ -26,18 +26,17 @@ def build_short_term_model(input_seq: np.ndarray, output_seq: np.ndarray,
     """
 
     # 0. 定义时间步长、特征值
-    n_steps_in = 24
-    n_steps_out = 24
+    time_step = 24
     n_features = 8
 
     # 1. 构建模型
     model = Sequential()
     # 1.1 LSTM层 -> 500个LSTM单元
-    model.add(LSTM(500, activation='relu', input_shape=(n_steps_in, n_features)))
+    model.add(LSTM(500, activation='relu', input_shape=(time_step, n_features)))
     # 1.2 Droput正则化，减少过拟合风险
     model.add(Dropout(0.5))
     # 1.3 为每一个时间步创建一个预测
-    model.add(RepeatVector(n_steps_out))
+    model.add(RepeatVector(time_step))
     # 1.4 LSTM层 -> 500个LSTM单元，返回完整序列
     model.add(LSTM(200, activation='relu', return_sequences=True))
     # 1.5 在每个时间步上应用一个全连接层，输出特征数量的预测

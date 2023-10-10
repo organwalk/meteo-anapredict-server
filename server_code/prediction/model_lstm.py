@@ -4,7 +4,7 @@
 """
 from server_code.repository import repository
 from tensorflow.keras.models import load_model
-from server_code.config.application import MODEL_PATH
+from server_code.application import MODEL_PATH
 import numpy as np
 from typing import List
 

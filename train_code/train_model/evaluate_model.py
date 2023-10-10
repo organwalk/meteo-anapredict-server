@@ -9,6 +9,7 @@ from typing import List
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import MinMaxScaler
 from datetime import datetime
+from config import TRAIN_LOG_PATH
 
 
 def get_rmse(pred_result: List[List[float]], val_seq: List[List[float]]):
@@ -24,7 +25,7 @@ def get_rmse(pred_result: List[List[float]], val_seq: List[List[float]]):
     """
     rmse = np.sqrt(mean_squared_error(val_seq, pred_result))
     print(f"-->均方根误差:{rmse}")
-    _write_to_log(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+    _write_to_log("date:" + datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
     _write_to_log("rmse:" + str(rmse))
 
 
@@ -113,7 +114,7 @@ def chart_compared(pred_result: List[List[float]], val_seq: List[List[float]]):
     plt.show()
 
 
-log_file = open("C:/Users/haruki/PycharmProjects/meteo-anapredict-server/train_code/train_model/log/training_short_lstm_log.txt", "a")
+log_file = open(TRAIN_LOG_PATH + "training_short_lstm_log.txt", "a")
 
 
 def _write_to_log(message):

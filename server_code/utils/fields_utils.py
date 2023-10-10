@@ -4,7 +4,7 @@
 """
 import re
 from server_code.repository import repository
-from server_code.config.application import SHORT_TERM_MODEL_LIST, LONG_TERM_MODEL_LIST
+from server_code.application import SHORT_TERM_MODEL_LIST, LONG_TERM_MODEL_LIST
 from datetime import datetime, timedelta
 from typing import Union, Dict
 

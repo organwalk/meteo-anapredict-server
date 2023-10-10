@@ -9,8 +9,8 @@ import threading
 import time
 
 
-FILE_PATH = "C:/Users/haruki/PycharmProjects/meteo-anapredict-server/meteo_data_csv/"
-MODEL_PATH = "C:/Users/haruki/PycharmProjects/meteo-anapredict-server/meteo_model"
+FILE_PATH = "../meteo_data_csv/"
+MODEL_PATH = "../meteo_model"
 
 SHORT_TERM_MODEL_LIST = [
     'SHORTTERM_LSTM',

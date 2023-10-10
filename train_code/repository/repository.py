@@ -3,7 +3,7 @@
     by organwalk 2023-09-19
 """
 from typing import Union, List
-from server_code.config.application import FILE_PATH
+from config import FILE_PATH
 from datetime import datetime, timedelta
 import os
 import numpy as np
@@ -33,7 +33,6 @@ def get_csv(station: str, start_date: str, end_date: str) -> Union[List[str], st
     while current_date <= end_date:
         # 构建文件名
         file_path = f"{FILE_PATH}{station}_data_{current_date.strftime('%Y-%m-%d')}.csv"
-
         if os.path.exists(file_path):
             existing_files.append(file_path)
             consecutive_missing_count = 0
