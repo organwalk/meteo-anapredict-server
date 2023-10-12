@@ -54,8 +54,6 @@ def build_short_term_model(input_seq: np.ndarray, output_seq: np.ndarray,
 
 
 def build_long_term_model(input_seq: np.ndarray, output_seq: np.ndarray) -> Sequential:
-    print(input_seq.shape)
-    print(output_seq.shape)
     # 0. 定义时间步长
     n_steps_in, n_steps_out = 7, 7
     model.add(LSTM(500, activation='relu', input_shape=(n_steps_in, n_features)))
@@ -97,6 +95,7 @@ def get_short_predict(train_model: Sequential, df_data: pd.DataFrame, scaler: Mi
 def get_long_predict(train_model: Sequential, data_list: list, scaler: MinMaxScaler) -> List[List[float]]:
     # 0. 根据时间步长、特征值划分numpy数组为输入序列
     time_step = 7
+    print(data_list)
     x_input = np.reshape([np.array(a[0]) for a in data_list], (1, time_step, n_features))
     # 1. 使用模型获取预测结果
     output_data = train_model.predict(x_input, verbose=1)[0]

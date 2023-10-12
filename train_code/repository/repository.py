@@ -71,11 +71,8 @@ def get_one_csv_data(station: str, date: str) -> Tuple[pd.DataFrame, MinMaxScale
 
 
 def get_seven_csv_data(station: str, date: str) -> Tuple[list, MinMaxScaler]:
-    datetime_date = datetime.strptime(date, '%Y-%m-%d')
-    end_date = datetime_date + timedelta(days=6)
-    print(end_date)
-    end_date = end_date.strftime('%Y-%m-%d')
-    existing_files = get_csv(station, date, end_date)
+    start_date = (datetime.strptime(date, '%Y-%m-%d') + timedelta(days=-6)).strftime('%Y-%m-%d')
+    existing_files = get_csv(station, start_date, date)
     all_data = list()
     scaler = None
     for file in existing_files:
@@ -83,8 +80,6 @@ def get_seven_csv_data(station: str, date: str) -> Tuple[list, MinMaxScaler]:
         avg_df_data = dtools.calculate_day_avg(df)
         df_data, scaler = dtools.get_scaler_result(avg_df_data)
         all_data.append(df_data)
-    print(all_data)
-    print(type(all_data))
     return all_data, scaler
 
 
