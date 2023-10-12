@@ -69,25 +69,26 @@ def split_long_term_sequences(station: str, start_date: str, end_date: str) \
 
     by organwalk 2023-10-11
     """
-    # 0. 获取有效数据文件路径数组
     existing_files = repository.get_csv(station, start_date, end_date)
     if isinstance(existing_files, str):
         return existing_files
     x, y = list(), list()
     scaler = None
-    for i in range(len(existing_files)):
-        df_current = pd.read_csv(existing_files[i])
-        avg_df_current = dtools.calculate_day_avg(df_current)
-        df_data_current, scaler = dtools.get_scaler_result(avg_df_current)
-        x.append(df_data_current)
-        output_group = []
-        if len(existing_files) - i >= 7:
-            for output_index in range(1, len(existing_files)):
-                df_next = pd.read_csv(existing_files[i + output_index])
-                avg_df_next = dtools.calculate_day_avg(df_next)
-                df_next, _ = dtools.get_scaler_result(avg_df_next)
-                output_group.append(df_next)
-                if output_index > 7:
-                    break
-        y.append(output_group)
-    return np.array(x), np.array(y), scaler
+    all_data = []
+    n_step_in, n_step_out = 7, 7
+    for file in existing_files:
+        df = pd.read_csv(file)
+        avg_df_data = dtools.calculate_day_avg(df)
+        df_data, scaler = dtools.get_scaler_result(avg_df_data)
+        all_data.append(df_data)
+    for i in range(len(all_data)):
+        end_ix = i + n_step_in
+        out_end_ix = end_ix + n_step_out
+        if out_end_ix <= len(all_data):
+            seq_x = all_data[i:end_ix]
+            seq_y = all_data[end_ix:out_end_ix]
+            x.append(seq_x)
+            y.append(seq_y)
+    x = np.array(x)
+    y = np.array(y)
+    return x[0], y[0], scaler

@@ -30,7 +30,7 @@ def train_lstm_short_term():
     # 2. 获取被预测数据
     df_data, scaler = repository.get_one_csv_data(station='1', date='2023-07-26')
     # 3. 代入构建的训练模型与被预测数据，进行数据预测
-    predict_result = train_lstm.get_predict(m_type='short', train_model=model, df_data=df_data, scaler=scaler)
+    predict_result = train_lstm.get_short_predict(train_model=model, df_data=df_data, scaler=scaler)
 
     # 4. 评估模型
     nonscaler_val_seq = repository.get_one_csv_data_tolist(station='1', date='2023-07-27')
@@ -63,9 +63,10 @@ def train_lstm_long_term():
     # 1. 构建并训练模型
     model = train_lstm.build_long_term_model(input_seq=input_seq, output_seq=output_seq)
     # 2. 获取被预测数据
-    df_data, scaler = repository.get_one_csv_data(station='1', date='2023-07-21')
+    data_list, scaler = repository.get_seven_csv_data(station='1', date='2023-07-21')
     # 3. 代入构建的训练模型与被预测数据，进行数据预测
-    predict_result = train_lstm.get_long_lstm_predict(train_model=model, input_data=df_data, scaler=scaler)
+    predict_result = train_lstm.get_long_predict(train_model=model, data_list=data_list, scaler=scaler)
+    print(predict_result)
     # # 4. 评估模型
     # nonscaler_val_seq = repository.get_one_csv_data_tolist(station='1', date='2023-07-27')
     # # 4.1 均方误差
@@ -88,5 +89,6 @@ def train_lstm_long_term():
     #                   val_output=comp_val_output)
     # # 4.5 验证集与预测结果比较图表
     # evalu.chart_compared(pred_result=predict_result, val_seq=nonscaler_val_seq)
+
 
 train_lstm_long_term()

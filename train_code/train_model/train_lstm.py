@@ -54,19 +54,23 @@ def build_short_term_model(input_seq: np.ndarray, output_seq: np.ndarray,
 
 
 def build_long_term_model(input_seq: np.ndarray, output_seq: np.ndarray) -> Sequential:
-    time_steps = 7
-    model.add(LSTM(units=50, input_shape=(time_steps, n_features)))
-    model.add(Dense(units=n_features))
-    model.compile(optimizer='adam', loss='mse')
-    model.fit(input_seq, output_seq, epochs=50, batch_size=32)
+    print(input_seq.shape)
+    print(output_seq.shape)
+    # 0. 定义时间步长
+    n_steps_in, n_steps_out = 7, 7
+    model.add(LSTM(500, activation='relu', input_shape=(n_steps_in, n_features)))
+    model.add(RepeatVector(n_steps_out))
+    model.add(LSTM(500, activation='relu', return_sequences=True))
+    model.add(TimeDistributed(Dense(n_features)))
 
+    model.compile(optimizer='adam', loss='mse')
+    model.fit(input_seq, output_seq, epochs=5, verbose=1)
     return model
 
 
-def get_predict(m_type: str, train_model: Sequential, df_data: pd.DataFrame, scaler: MinMaxScaler) -> List[List[float]]:
+def get_short_predict(train_model: Sequential, df_data: pd.DataFrame, scaler: MinMaxScaler) -> List[List[float]]:
     """
     获取LSTM短期模型的预测结果
-    :param m_type: 模型类别
     :param train_model: 训练后LSTM短期模型对象
     :param df_data: 被预测数据
     :param scaler: 解归一化缩放器
@@ -77,12 +81,7 @@ def get_predict(m_type: str, train_model: Sequential, df_data: pd.DataFrame, sca
     """
 
     # 0. 根据时间步长、特征值划分numpy数组为输入序列
-    if m_type == 'short':
-        time_step = 24
-    elif m_type == 'long':
-        time_step = 7
-    else:
-        time_step = 0
+    time_step = 24
     input_data = np.array([df_data])
     x_input = input_data.reshape((1, time_step, n_features))
     # 1. 使用模型获取预测结果
@@ -95,17 +94,15 @@ def get_predict(m_type: str, train_model: Sequential, df_data: pd.DataFrame, sca
     return predict_result
 
 
-def get_long_lstm_predict(train_model, input_data, scaler, ):
-    predictions = []
+def get_long_predict(train_model: Sequential, data_list: list, scaler: MinMaxScaler) -> List[List[float]]:
+    # 0. 根据时间步长、特征值划分numpy数组为输入序列
+    time_step = 7
+    x_input = np.reshape([np.array(a[0]) for a in data_list], (1, time_step, n_features))
+    # 1. 使用模型获取预测结果
+    output_data = train_model.predict(x_input, verbose=1)[0]
+    # 2. 获得解归一化的预测结果
+    non_scaler_output = scaler.inverse_transform(output_data).reshape((time_step, n_features))
+    # 3. 保留预测结果小数点后两位，二维数组化的预测结果
+    predict_result = np.round(non_scaler_output).round(2).tolist()
 
-    for _ in range(7):
-        prediction = train_model.predict(np.expand_dims(input_data, axis=0))
-        predictions.append(prediction)
-        input_data = np.concatenate((input_data[1:], prediction), axis=0)
-
-    # 反归一化
-    predictions = np.array(predictions)
-    predictions = scaler.inverse_transform(predictions.reshape(predictions.shape[0], -1))
-
-    # 打印预测结果
-    print(predictions)
+    return predict_result
