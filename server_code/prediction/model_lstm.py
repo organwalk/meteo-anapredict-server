@@ -4,7 +4,7 @@
 """
 from server_code.repository import repository
 from tensorflow.keras.models import load_model
-from server_code.application import MODEL_PATH
+from config import MODEL_PATH
 import numpy as np
 from typing import List
 
@@ -12,7 +12,6 @@ from typing import List
 def get_short_term_predict(station: str, date: str) -> List[List[int]]:
     """
     获取LSTM短期模型的预测结果
-
     :param station: 气象站编号
     :param date: 日期
     :return:
@@ -25,7 +24,7 @@ def get_short_term_predict(station: str, date: str) -> List[List[int]]:
     # 0. 获取归一化后的数据，及解归一化使用的scaler对象
     df_data, scaler = repository.get_one_csv_data(station, date)
     # 1. 加载模型
-    model = load_model(f'{MODEL_PATH}/short_term/lstm.h5')
+    model = load_model(f'{MODEL_PATH}/short_lstm.h5')
     # 2. 获取预测数据
     # 2.1 将输入数据窗转为numpy数组
     input_data = np.array([df_data])
@@ -37,4 +36,21 @@ def get_short_term_predict(station: str, date: str) -> List[List[int]]:
     non_scaler_output = scaler.inverse_transform(output_data).reshape((time_step, feature))
     # 2.5 保留预测结果小数点后两位，二维数组化的预测结果
     predict_result = np.round(non_scaler_output).round(2).tolist()
+    return predict_result
+
+
+def get_long_term_predict(station: str, date: str) -> List[List[int]]:
+    model = load_model(f'{MODEL_PATH}/long_lstm.h5')
+    data_list, scaler = repository.get_seven_csv_data(station=station, date=date)
+    # 0. 根据时间步长、特征值划分numpy数组为输入序列
+    time_step = 7
+    n_features = 8
+    x_input = np.reshape([np.array(a[0]) for a in data_list], (1, time_step, n_features))
+    # 1. 使用模型获取预测结果
+    output_data = model.predict(x_input, verbose=1)[0]
+    # 2. 获得解归一化的预测结果
+    non_scaler_output = scaler.inverse_transform(output_data).reshape((time_step, n_features))
+    # 3. 保留预测结果小数点后两位，二维数组化的预测结果
+    predict_result = np.round(non_scaler_output).round(2).tolist()
+
     return predict_result

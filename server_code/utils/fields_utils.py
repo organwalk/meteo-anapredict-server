@@ -4,7 +4,7 @@
 """
 import re
 from server_code.repository import repository
-from server_code.application import SHORT_TERM_MODEL_LIST, LONG_TERM_MODEL_LIST
+from config import SHORT_TERM_MODEL_LIST, LONG_TERM_MODEL_LIST
 from datetime import datetime, timedelta
 from typing import Union, Dict
 
@@ -12,7 +12,6 @@ from typing import Union, Dict
 def validate_station(station: str) -> Union[str, Dict[str, str]]:
     """
     校验气象站编号字段的正确性
-
     :param station: 气象站编号
     :return:
         str or dict: station的值，如果校验不通过则返回错误消息
@@ -44,7 +43,6 @@ def validate_date(station: str, date: str) -> Union[str, Dict[str, str]]:
 def validate_which_or_correlation(elements: str) -> Union[str, Dict[str, str]]:
     """
     校验气象要素的正确性
-
     :param elements: 气象要素
     :return:
         str or dict: elements的值，如果校验不通过则返回错误消息
@@ -61,7 +59,6 @@ def validate_which_or_correlation(elements: str) -> Union[str, Dict[str, str]]:
 def validate_model_type(model_type: str) -> Union[str, Dict[str, str]]:
     """
     校验模型类型的正确性
-
     :param model_type: 模型类型
     :return:
         str or dict: model_type的值，如果校验不通过则返回错误消息
@@ -78,7 +75,6 @@ def validate_model_type(model_type: str) -> Union[str, Dict[str, str]]:
 def validate_five_day_date_range(start_date: str, end_date: str) -> bool:
     """
     校验日期范围是否大于等于五天
-
     :param start_date: 起始日期
     :param end_date: 结束日期
     :return:
@@ -93,7 +89,6 @@ def validate_five_day_date_range(start_date: str, end_date: str) -> bool:
 def _get_error_msg(msg: str) -> dict:
     """
     返回字典形式的错误消息
-
     :param msg: (str)错误消息
     :return:
         dict: 错误消息的字典形式

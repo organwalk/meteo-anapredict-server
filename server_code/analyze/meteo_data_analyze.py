@@ -9,7 +9,6 @@ from typing import List, Optional
 def calculate_correlation_matrix(elements: str, merged_data: pd.DataFrame) -> Optional[List]:
     """
     计算协相关矩阵
-
     :param elements: 需要进行计算的气象要素
     :param merged_data: 连续时间段CSV合并数据
     :return:

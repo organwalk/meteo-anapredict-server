@@ -1,33 +1,33 @@
 from server_code.entity import res_entity
+from config import FILE_PATH, MODEL_PATH
 from server_code.application import get_mysql_obj
-from server_code.application import FILE_PATH
-import server_code.repository.mysql_statements as mysql_statements
 import pandas as pd
 from typing import Union, List, Dict
 from server_code.utils import data_utils
 from typing import Tuple
 from sklearn.preprocessing import MinMaxScaler
+import json
+from datetime import datetime, timedelta
+import os
 
 
 def get_model_info() -> Union[Dict, List]:
     """
     获取模型信息
-
     :return:
         OrderedDict or list: 返回封装为OrderedDict的结果，当结果为空时，返回空列表
 
     by organwalk 2023-08-15
     """
-    mysql = get_mysql_obj()
-    mysql.execute(mysql_statements.NEW_MODEL_INFO)
-    result = mysql.fetchall()[0][1:7]
-    return res_entity.set_model_info(*result) if result else []
+    with open(MODEL_PATH + 'model_info.json', 'r', encoding='utf-8') as file:
+        json_data = file.read()
+    model_info = json.loads(json_data)
+    return res_entity.set_model_info(**model_info) if model_info else []
 
 
 def validate_station_date(station: str, date: str) -> int:
     """
     校验指定气象站下的日期是否存在记录
-
     :param station: 气象站编号
     :param date: 需要校验的日期
     :return:
@@ -36,14 +36,13 @@ def validate_station_date(station: str, date: str) -> int:
     by organwalk 2023-08-15
     """
     mysql = get_mysql_obj()
-    mysql.execute(mysql_statements.VALID_DATE, (station, date))
+    mysql.execute("select count(id) from station_date where station = %s and date = %s", (station, date))
     return int(mysql.fetchall()[0][0])
 
 
 def get_merged_csv_data(station: str, start_date: str, end_date: str) -> pd.DataFrame:
     """
     获取指定气象站点下起止日期连续时间段内合并的CSV数据
-
     :param station: 气象站编号
     :param start_date: 起始日期
     :param end_date: 结束日期
@@ -74,7 +73,6 @@ def get_merged_csv_data(station: str, start_date: str, end_date: str) -> pd.Data
 def get_one_csv_data(station: str, date: str) -> Tuple[pd.DataFrame, MinMaxScaler]:
     """
     获取一份CSV数据集经过归一化处理后的数据窗
-
     :param station: 气象站编号
     :param date: 日期
     :return:
@@ -90,3 +88,52 @@ def get_one_csv_data(station: str, date: str) -> Tuple[pd.DataFrame, MinMaxScale
     # 2.将上一步数据进行归一化处理，获得最终的数据窗
     df_scaler_data, scaler = data_utils.get_scaler_result(df_avg_data)
     return df_scaler_data, scaler
+
+
+def get_csv(station: str, start_date: str, end_date: str) -> Union[List[str], str]:
+    """
+    获取有效csv数据集文件路径列表
+    :param station: 气象站编号
+    :param start_date: 起始日期
+    :param end_date: 结束日期
+    :return:
+        List[str] or AnyStr: 返回csv数据集文件路径列表，无法前向填充时返回错误消息
+
+    by organwalk 2023-09-17
+    """
+    start_date = datetime.strptime(start_date, "%Y-%m-%d")
+    end_date = datetime.strptime(end_date, "%Y-%m-%d")
+    existing_files = []
+    existing_path = ''
+    current_date = start_date
+    consecutive_missing_count = 0
+    while current_date <= end_date:
+        # 构建文件名
+        file_path = f"{FILE_PATH}{station}_data_{current_date.strftime('%Y-%m-%d')}.csv"
+        if os.path.exists(file_path):
+            existing_files.append(file_path)
+            consecutive_missing_count = 0
+            existing_path = file_path
+        else:
+            if consecutive_missing_count < 5:
+                existing_files.append(existing_path)
+                consecutive_missing_count += 1
+            else:
+                return "连续时间段内缺失文件过多，无法进行前向填充"
+
+        current_date += timedelta(days=1)
+
+    return existing_files
+
+
+def get_seven_csv_data(station: str, date: str) -> Tuple[list, MinMaxScaler]:
+    start_date = (datetime.strptime(date, '%Y-%m-%d') + timedelta(days=-6)).strftime('%Y-%m-%d')
+    existing_files = get_csv(station, start_date, date)
+    all_data = list()
+    scaler = None
+    for file in existing_files:
+        df = pd.read_csv(file)
+        avg_df_data = data_utils.calculate_day_avg(df)
+        df_data, scaler = data_utils.get_scaler_result(avg_df_data)
+        all_data.append(df_data)
+    return all_data, scaler

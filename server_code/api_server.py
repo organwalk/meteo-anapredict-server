@@ -17,8 +17,7 @@ app = Flask(__name__)
 @app.route('/anapredict/model/info', methods=['GET'])
 def _api_model_info() -> Response:
     """
-    从数据库中获取并返回模型信息
-
+    获取并返回模型信息
     :return:
         Response: 根据获取状态返回相应的消息以及数据
 
@@ -32,7 +31,6 @@ def _api_model_info() -> Response:
 def _api_data_correlation() -> Response:
     """
     对给定的要求进行气象数据分析
-
     :return:
         Response: 根据获取状态返回相应的消息以及数据
 
@@ -53,7 +51,6 @@ def _api_data_correlation() -> Response:
 def _api_model_prediction() -> Response:
     """
     根据用户的配置信息进行模型预测
-
     :return:
         Response: 根据模型预测结果返回相应的消息以及数据
 

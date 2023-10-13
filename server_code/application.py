@@ -8,24 +8,6 @@ from nacos import NacosClient
 import threading
 import time
 
-
-FILE_PATH = "../meteo_data_csv/"
-MODEL_PATH = "../meteo_model"
-
-SHORT_TERM_MODEL_LIST = [
-    'SHORTTERM_LSTM',
-    'SHORTTERM_ARIMA',
-    'SHORTTERM_PROPHET',
-    'SHORTTERM_MIXED'
-    ]
-
-LONG_TERM_MODEL_LIST = [
-    'LONGTERM_LSTM',
-    'LONGTERM_ARIMA',
-    'LONGTERM_PROPHET',
-    'LONGTERM_MIXED'
-]
-
 _MYSQL_CONFIG = {
     'host': 'localhost',
     'user': 'root',

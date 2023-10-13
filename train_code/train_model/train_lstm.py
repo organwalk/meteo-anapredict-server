@@ -10,6 +10,7 @@ import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
 from typing import List
 
+import config
 
 n_features = 8  # 气象数据特征值
 model = Sequential()  # 创建模型对象
@@ -49,6 +50,7 @@ def build_short_term_model(input_seq: np.ndarray, output_seq: np.ndarray,
     early_stopping = EarlyStopping(monitor='val_loss', patience=10)
     model.fit(input_seq, output_seq, epochs=1000, verbose=1,
               validation_data=(val_input_seq, val_output_seq), callbacks=[early_stopping])
+    model.save("short_lstm.h5")
 
     return model
 
@@ -63,6 +65,7 @@ def build_long_term_model(input_seq: np.ndarray, output_seq: np.ndarray) -> Sequ
 
     model.compile(optimizer='adam', loss='mse')
     model.fit(input_seq, output_seq, epochs=5, verbose=1)
+    model.save("long_lstm.h5")
     return model
 
 
@@ -95,7 +98,6 @@ def get_short_predict(train_model: Sequential, df_data: pd.DataFrame, scaler: Mi
 def get_long_predict(train_model: Sequential, data_list: list, scaler: MinMaxScaler) -> List[List[float]]:
     # 0. 根据时间步长、特征值划分numpy数组为输入序列
     time_step = 7
-    print(data_list)
     x_input = np.reshape([np.array(a[0]) for a in data_list], (1, time_step, n_features))
     # 1. 使用模型获取预测结果
     output_data = train_model.predict(x_input, verbose=1)[0]

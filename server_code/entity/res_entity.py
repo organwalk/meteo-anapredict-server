@@ -8,7 +8,6 @@ from collections import OrderedDict
 def set_model_info(version: str, cn_des: str, technology: str, support: str, update: str) -> OrderedDict:
     """
     封装/anapredict/correlation接口的响应数据
-
     :param version: 版本信息
     :param cn_des: 中文描述
     :param technology: 模型使用的技术栈
