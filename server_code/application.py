@@ -16,6 +16,14 @@ _MYSQL_CONFIG = {
 }
 
 
+REDIS_CONFIG = {
+    'host': 'localhost',
+    'port': '36379',
+    'db': '1',
+    'password': '123456'
+}
+
+
 def get_mysql_obj():
     """
     返回MySQL的游标对象

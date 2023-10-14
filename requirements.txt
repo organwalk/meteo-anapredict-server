@@ -8,3 +8,4 @@ tensorFlow
 keras
 scikit-learn
 matplotlib
+redis

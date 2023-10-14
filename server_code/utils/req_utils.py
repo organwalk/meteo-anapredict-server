@@ -22,12 +22,10 @@ def validate_json_user_req(api: str, user_req_json: dict, server_req_fields: lis
     # 0.检验调用方请求是否存在JSON格式数据
     if not user_req_json:
         return '调用方未能正确传递JSON格式数据'
-
     # 1.检验JSON格式数据是否存在空缺值
     missing_check = _validate_json_missing(user_req_json, server_req_fields)
     if missing_check:
         return f'调用方传递JSON格式数据存在空缺值，提示消息如下：{missing_check}'
-
     # 2.检验对应接口的JSON格式数据其值类型与格式是否正确
     error_msg = _validate_json_value(user_req_json, api)
     if error_msg is not None:
@@ -65,6 +63,8 @@ def _validate_json_value(user_req_json: dict, api: str) -> Optional[str]:
     """
     if api == '/anapredict/model/report':
         return _validate_api_report(user_req_json)
+    if api == '/anapredict/cleaned':
+        return _validate_api_cleaned(user_req_json)
     if api == '/anapredict/analyze/correlation':
         return _validate_api_correlation(user_req_json)
     if api == '/anapredict/model/prediction':
@@ -84,6 +84,25 @@ def _validate_api_report(user_req_json: dict) -> Optional[str]:
     by organwalk 2023-10-14
     """
     error_msg_list = [fields_utils.validate_model_type(user_req_json.get('model_type'))]
+    msg_list = [msg['msg'] for msg in error_msg_list if isinstance(msg, dict)]
+    return '；'.join(set(msg_list)) if msg_list else None
+
+
+def _validate_api_cleaned(user_req_json: dict) -> Optional[str]:
+    """
+    校验/anapredict/cleaned接口的json数据
+    :param user_req_json: 调用方传递的JSON数据：
+        station: (str) 气象站编号
+        start_date: (str) 起始日期
+        end_date: (str) 结束日期
+    :return:
+        str or None: 错误消息，如果校验通过则返回None
+
+    by organwalk 2023-10-14
+    """
+    error_msg_list = [fields_utils.validate_station(user_req_json['station']),
+                      fields_utils.validate_date(user_req_json['station'], user_req_json['start_date']),
+                      fields_utils.validate_date(user_req_json['station'], user_req_json['end_date'])]
     msg_list = [msg['msg'] for msg in error_msg_list if isinstance(msg, dict)]
     return '；'.join(set(msg_list)) if msg_list else None
 

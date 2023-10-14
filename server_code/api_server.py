@@ -10,6 +10,7 @@ import entity.req_entity as server_req
 from utils import req_utils
 from service import analyze_service
 from service.prediction_service import predict_by_model
+from cleaned.meteo_data_cleaned import etl_data
 
 app = Flask(__name__)
 
@@ -42,6 +43,25 @@ def _api_model_report() -> Response:
     if validate is None:
         report = repository.get_model_report(**request.get_json())
         return result.success('获取模型报告成功', report) if report else result.not_found('暂无报告')
+    else:
+        return result.fail_entity(validate)
+
+
+@app.route('/anapredict/cleaned', methods=['POST'])
+def _api_data_cleaned() -> Response:
+    """
+    供内部服务调用的数据清洗服务
+    :return:
+        Response: 根据获取状态返回相应的消息
+
+    by organwalk 2023-10-14
+    """
+    validate = req_utils.validate_json_user_req('/anapredict/cleaned',
+                                                request.get_json(),
+                                                server_req.CLEANED)
+    if validate is None:
+        etl_data(**request.get_json())
+        return result.success('已成功清洗此时间范围内数据数据', None)
     else:
         return result.fail_entity(validate)
 

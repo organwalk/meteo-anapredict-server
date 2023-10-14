@@ -5,3 +5,4 @@
 REPORT = ['model_type']
 CORRELATION = ['station', 'start_date', 'end_date', 'correlation']
 PREDICTION = ['station', 'start_date', 'model_type']
+CLEANED = ['station', 'start_date', 'end_date']
