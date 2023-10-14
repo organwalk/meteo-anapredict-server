@@ -1,6 +1,11 @@
+"""
+    如果数据集文件内容出现大量缺失，可以执行此脚本
+    by organwalk 2023-10-12
+"""
+
 import csv
 from datetime import datetime, timedelta
-from server_code import application as config
+import config
 
 input_file = config.FILE_PATH + '1_data_2023-07-03.csv'
 output_file = config.FILE_PATH + 'output.csv'
