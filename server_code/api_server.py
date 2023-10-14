@@ -27,6 +27,25 @@ def _api_model_info() -> Response:
     return result.success('成功获取模型信息', info_data) if info_data else result.not_found('未能获取模型信息')
 
 
+@app.route('/anapredict/model/report', methods=['POST'])
+def _api_model_report() -> Response:
+    """
+    获取并返回模型报告
+    :return:
+        Response: 根据获取状态返回想要的消息以及数据
+
+    by organwalk 2023-10-14
+    """
+    validate = req_utils.validate_json_user_req('/anapredict/model/report',
+                                                request.get_json(),
+                                                server_req.REPORT)
+    if validate is None:
+        report = repository.get_model_report(**request.get_json())
+        return result.success('获取模型报告成功', report) if report else result.not_found('暂无报告')
+    else:
+        return result.fail_entity(validate)
+
+
 @app.route('/anapredict/analyze/correlation', methods=['POST'])
 def _api_data_correlation() -> Response:
     """

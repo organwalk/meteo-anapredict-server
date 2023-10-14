@@ -4,6 +4,8 @@
 """
 from server_code.utils import fields_utils
 from typing import Optional
+from datetime import datetime, timedelta
+import server_code.repository.repository as repository
 
 
 def validate_json_user_req(api: str, user_req_json: dict, server_req_fields: list) -> Optional[str]:
@@ -61,12 +63,29 @@ def _validate_json_value(user_req_json: dict, api: str) -> Optional[str]:
 
     by organwalk 2023-08-15
     """
+    if api == '/anapredict/model/report':
+        return _validate_api_report(user_req_json)
     if api == '/anapredict/analyze/correlation':
         return _validate_api_correlation(user_req_json)
     if api == '/anapredict/model/prediction':
         return _validate_api_prediction(user_req_json)
     else:
         return None
+
+
+def _validate_api_report(user_req_json: dict) -> Optional[str]:
+    """
+    校验/anapredict/model/report接口的JSON数据
+    :param user_req_json: 调用方传递的JSON数据：
+        model_type: (str) 模型类型
+    :return:
+        str or None: 错误消息，如果校验通过则返回None
+
+    by organwalk 2023-10-14
+    """
+    error_msg_list = [fields_utils.validate_model_type(user_req_json.get('model_type'))]
+    msg_list = [msg['msg'] for msg in error_msg_list if isinstance(msg, dict)]
+    return '；'.join(set(msg_list)) if msg_list else None
 
 
 def _validate_api_correlation(user_req_json: dict) -> Optional[str]:
@@ -110,5 +129,12 @@ def _validate_api_prediction(user_req_json: dict) -> Optional[str]:
                       fields_utils.validate_model_type(user_req_json['model_type'])]
     msg_list = [msg['msg'] for msg in error_msg_list if isinstance(msg, dict)]
     # error_msg_list的子元素错误消息为字典形式，若为str类型，则表示没有错误消息
-
+    if user_req_json.get("model_type") == "LONGTERM_LSTM":
+        date = (datetime.strptime(user_req_json.get("start_date"), '%Y-%m-%d')
+                + timedelta(days=-6)).strftime('%Y-%m-%d')
+        check = repository.validate_station_date_range(station=user_req_json.get('station'),
+                                                       start_date=date,
+                                                       end_date=user_req_json.get('start_date'))
+        if check < 7:
+            msg_list.append(f"该日期{user_req_json.get('start_date')}不可作为起始日期，原因：气象站缺失连续时间段内数据")
     return '；'.join(set(msg_list)) if msg_list else None

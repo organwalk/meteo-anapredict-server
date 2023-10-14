@@ -1,3 +1,4 @@
+import config
 from server_code.entity import res_entity
 from config import FILE_PATH, MODEL_PATH
 from server_code.application import get_mysql_obj
@@ -25,6 +26,37 @@ def get_model_info() -> Union[Dict, List]:
     return res_entity.set_model_info(**model_info) if model_info else []
 
 
+def get_model_report(model_type: str) -> Union[Dict, List]:
+    """
+    获取模型报告
+    :return:
+        OrderedDict or list: 返回封装为OrderedDict的结果，当结果为空时，返回空列表
+
+    by organwalk 2023-10-14
+    """
+    path = ''
+    if model_type == 'SHORTTERM_LSTM':
+        path = config.TRAIN_LOG_PATH + 'training_short_lstm_log.txt'
+    elif model_type == 'LONGTERM_LSTM':
+        path = config.TRAIN_LOG_PATH + 'training_long_lstm_log.txt'
+    # 读取文件内容
+    data_dict = {}
+    with open(path, "r") as file:
+        lines = file.readlines()
+    # 从文件的最后第二行开始读起
+    i = len(lines) - 2
+    while i >= 0:
+        line = lines[i].strip()
+        print(line)
+        if line == "-----":
+            break
+        else:
+            key, value = line.split(":", 1)
+            data_dict[key] = value.strip()
+        i -= 1
+    return res_entity.set_model_report(**data_dict) if data_dict else {}
+
+
 def validate_station_date(station: str, date: str) -> int:
     """
     校验指定气象站下的日期是否存在记录
@@ -37,6 +69,21 @@ def validate_station_date(station: str, date: str) -> int:
     """
     mysql = get_mysql_obj()
     mysql.execute("select count(id) from station_date where station = %s and date = %s", (station, date))
+    return int(mysql.fetchall()[0][0])
+
+
+def validate_station_date_range(station: str, start_date: str, end_date: str) -> int:
+    """
+    校验指定气象站下的日期范围是否有七天
+    :param station: 气象站编号
+    :param start_date: 起始日期
+    :param end_date: 结束日期
+    :return:
+        int: 记录数
+    """
+    mysql = get_mysql_obj()
+    str_sql = "select count(*) from station_date where station = %s and date >= %s and date <= %s"
+    mysql.execute(str_sql, (station, start_date, end_date))
     return int(mysql.fetchall()[0][0])
 
 
