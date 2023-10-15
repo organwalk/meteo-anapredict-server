@@ -2,7 +2,7 @@
     定义获取LSTM长短期模型预测结果的函数
     by organwalk 2023-09-18
 """
-from server_code.repository import repository
+import repository
 from tensorflow.keras.models import load_model
 from config import MODEL_PATH
 import numpy as np

@@ -5,7 +5,7 @@
 from server_code.utils import fields_utils
 from typing import Optional
 from datetime import datetime, timedelta
-import server_code.repository.repository as repository
+import repository as repository
 
 
 def validate_json_user_req(api: str, user_req_json: dict, server_req_fields: list) -> Optional[str]:

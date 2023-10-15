@@ -3,7 +3,7 @@
     by organwalk 2023-08-15
 """
 from server_code.analyze import meteo_data_analyze
-from server_code.repository import repository
+import repository
 from typing import List, Optional
 
 

@@ -1,15 +1,19 @@
+"""
+    定义通用数据源模块
+    by organwalk 2023-08-15
+"""
 import config
+import json
+import os
+import pandas as pd
+import numpy as np
+import data_utils as dtools
 from server_code.entity import res_entity
 from config import FILE_PATH, MODEL_PATH
 from server_code.application import get_mysql_obj
-import pandas as pd
-from typing import Union, List, Dict
-from server_code.utils import data_utils
-from typing import Tuple
+from typing import Union, List, Dict, Tuple
 from sklearn.preprocessing import MinMaxScaler
-import json
 from datetime import datetime, timedelta
-import os
 
 
 def get_model_info() -> Union[Dict, List]:
@@ -80,6 +84,8 @@ def validate_station_date_range(station: str, start_date: str, end_date: str) ->
     :param end_date: 结束日期
     :return:
         int: 记录数
+
+    by organwalk 2023-10-14
     """
     mysql = get_mysql_obj()
     str_sql = "select count(*) from station_date where station = %s and date >= %s and date <= %s"
@@ -98,7 +104,7 @@ def get_merged_csv_data(station: str, start_date: str, end_date: str) -> pd.Data
 
     by organwalk 2023-08-20
     """
-    file_prefix = f"{FILE_PATH}{station}_data_"
+    file_prefix = f"{FILE_PATH}{station}/{station}_data_"
     file_extension = ".csv"
     data_frames = []
     date_range = pd.date_range(start_date, end_date)
@@ -127,14 +133,32 @@ def get_one_csv_data(station: str, date: str) -> Tuple[pd.DataFrame, MinMaxScale
 
     by organwalk 2023-09-17
     """
-    file_path = f"{FILE_PATH}{station}_data_{date}.csv"
+    file_path = f"{FILE_PATH}{station}/{station}_data_{date}.csv"
     # 0.将指定数据集读取为pandas数据窗
     df_file_data = pd.read_csv(file_path)
     # 1.将数据窗的每个特征处理为保留小数点后两位的24小时平均值
-    df_avg_data = data_utils.calculate_hour_avg(df_file_data)
+    df_avg_data = dtools.calculate_hour_avg(df_file_data)
     # 2.将上一步数据进行归一化处理，获得最终的数据窗
-    df_scaler_data, scaler = data_utils.get_scaler_result(df_avg_data)
+    df_scaler_data, scaler = dtools.get_scaler_result(df_avg_data)
     return df_scaler_data, scaler
+
+
+def get_one_csv_data_tolist(station: str, date: str) -> List[List[float]]:
+    """
+    将一份csv文件数据list化
+    :param station: 气象站编号
+    :param date: 日期
+    :return:
+        List[List[float]]: 浮点数二维数组
+    """
+    file_path = f"{FILE_PATH}{station}/{station}_data_{date}.csv"
+    # 0. 将指定数据集读取为pandas数据窗
+    df_file_data = pd.read_csv(file_path)
+    # 1. 将数据窗的每个特征处理为保留小数点后两位的24小时平均值
+    df_avg_data = dtools.calculate_hour_avg(df_file_data)
+    # 2. 返回二维数组
+    np_avg_data = np.round(df_avg_data.values).astype(float)
+    return np_avg_data.tolist()
 
 
 def get_csv(station: str, start_date: str, end_date: str) -> Union[List[str], str]:
@@ -156,7 +180,7 @@ def get_csv(station: str, start_date: str, end_date: str) -> Union[List[str], st
     consecutive_missing_count = 0
     while current_date <= end_date:
         # 构建文件名
-        file_path = f"{FILE_PATH}{station}_data_{current_date.strftime('%Y-%m-%d')}.csv"
+        file_path = f"{FILE_PATH}{station}/{station}_data_{current_date.strftime('%Y-%m-%d')}.csv"
         if os.path.exists(file_path):
             existing_files.append(file_path)
             consecutive_missing_count = 0
@@ -174,13 +198,22 @@ def get_csv(station: str, start_date: str, end_date: str) -> Union[List[str], st
 
 
 def get_seven_csv_data(station: str, date: str) -> Tuple[list, MinMaxScaler]:
+    """
+    获取连续七日csv数据，从date往前计算
+    :param station: 气象站编号
+    :param date: 截止日期
+    :return:
+        list and MinMaxScaler: 归一化后的所有数据以及缩放器
+
+    by organwalk 2023-10-12
+    """
     start_date = (datetime.strptime(date, '%Y-%m-%d') + timedelta(days=-6)).strftime('%Y-%m-%d')
     existing_files = get_csv(station, start_date, date)
     all_data = list()
     scaler = None
     for file in existing_files:
         df = pd.read_csv(file)
-        avg_df_data = data_utils.calculate_day_avg(df)
-        df_data, scaler = data_utils.get_scaler_result(avg_df_data)
+        avg_df_data = dtools.calculate_day_avg(df)
+        df_data, scaler = dtools.get_scaler_result(avg_df_data)
         all_data.append(df_data)
     return all_data, scaler

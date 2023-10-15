@@ -3,9 +3,9 @@
     by organwalk 2023.09.19
 """
 from numpy import ndarray
-from train_code.repository import repository
+import repository
 import pandas as pd
-from train_code.utils import data_utils as dtools
+import data_utils as dtools
 import numpy as np
 from typing import Tuple, Union, Optional, Any
 

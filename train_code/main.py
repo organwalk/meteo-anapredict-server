@@ -3,8 +3,8 @@
     by organwalk 2023-10-09
 """
 from train_model import train_lstm, evaluate_model as evalu
-from utils.lstm import pre_process as pre_lstm
-from repository import repository
+from train_code.train_model import pre_process as pre_lstm
+import repository
 
 
 def train_lstm_short_term():
@@ -14,7 +14,6 @@ def train_lstm_short_term():
 
     by organwalk 2023-10-09
     """
-
     # 0. 针对训练集和验证集划分输入序列和输出序列
     input_seq, output_seq, scaler = pre_lstm.split_short_term_sequences(station='1',
                                                                         start_date='2023-06-27',
@@ -57,6 +56,12 @@ def train_lstm_short_term():
 
 
 def train_lstm_long_term():
+    """
+    此函数定义了训练长期LSTM模型的执行代码
+    :return: None
+
+    by organwalk 2023-10-13
+    """
     input_seq, output_seq, scaler = pre_lstm.split_long_term_sequences(station='1',
                                                                        start_date='2023-06-27',
                                                                        end_date='2023-07-20')

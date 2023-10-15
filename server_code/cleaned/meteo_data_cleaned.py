@@ -42,6 +42,8 @@ def etl_data(station: str, start_date: str, end_date: str):
                 writer.writerow(values)
         # 清洗处理此文件
         _cleaned_data(station, current_date.strftime("%Y-%m-%d"))
+        # 检查是否需要前向填充
+        _missing_data_fill(station, current_date.strftime("%Y-%m-%d"))
         # 增加一天
         current_date += timedelta(days=1)
 
@@ -57,7 +59,7 @@ def _cleaned_data(station: str, date: str):
     by organwalk 2023-10-14
     """
     # 读取原始csv文件
-    path = FILE_PATH + f'{station}/{station}_data_{date}.csv'
+    path = f'{FILE_PATH}{station}/{station}_data_{date}.csv'
     data = pd.read_csv(path)
     # 缺失值处理：直接丢弃含有缺失值的行
     data = data.dropna()
@@ -74,5 +76,49 @@ def _cleaned_data(station: str, date: str):
     # 将内容重写为清洗转换后的数据
     with open(path, 'a') as file:
         file.write(','.join(data.columns) + '\n')
-        file.write(data.to_csv(header=False, index=False))
+        for index, row in data.iterrows():
+            if index != 0:
+                file.write('\n')  # 写入换行符
+            file.write(','.join(map(str, row)))
 
+
+def _missing_data_fill(station: str, date: str):
+    """
+    检查数据集在24小时内每小时是否都具有记录，若连续时间段内存在小时数据缺失，则前向填充一条记录
+    :param station: 气象站编号
+    :param date: 日期
+    :return:
+        None: 直到填充完成为止
+
+    by organwalk
+    """
+    path = f'{FILE_PATH}{station}/{station}_data_{date}.csv'
+    df = pd.read_csv(path, index_col='Time')
+    # 将索引转换为datetime格式，方便后续处理
+    df.index = pd.to_datetime(df.index)
+    # 检查是否有24个不同的小时值
+    if len(df.index.hour.unique()) != 24:
+        # 创建一个空的DataFrame，用于存储补全后的数据
+        new_df = pd.DataFrame()
+        # 遍历24个小时，每个小时为一个循环
+        for hour in range(24):
+            # 获取当前小时的数据
+            hour_df = df[df.index.hour == hour]
+            # 如果当前小时没有数据
+            if hour_df.empty:
+                # 获取前一个小时的最后一行数据
+                last_row = new_df.iloc[-1]
+                # 将最后一行数据的时间索引修改为当前小时的最后一分钟
+                last_row.name = last_row.name.replace(hour=hour, minute=59)
+                # 将修改后的数据添加到新的DataFrame中
+                new_df = new_df.append(last_row)
+            # 如果当前小时有数据
+            else:
+                # 将当前小时的数据添加到新的DataFrame中
+                new_df = new_df.append(hour_df)
+        # 重置索引，将Time列恢复为普通列
+        new_df = new_df.reset_index()
+        # 将Time列的格式转换为hh:MM:SS
+        new_df['Time'] = new_df['Time'].dt.strftime('%H:%M:%S')
+        # 输出新的csv文件，包含Time列
+        new_df.to_csv(path, index=False)

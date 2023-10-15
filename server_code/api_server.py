@@ -5,7 +5,7 @@
 from flask import Flask, request, Response
 from server_code.utils import result
 from server_code.application import register_to_nacos
-from server_code.repository import repository
+import repository
 import entity.req_entity as server_req
 from utils import req_utils
 from service import analyze_service

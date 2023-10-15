@@ -3,7 +3,7 @@
     by organwalk 2023-08-15
 """
 import re
-from server_code.repository import repository
+import repository
 from config import SHORT_TERM_MODEL_LIST, LONG_TERM_MODEL_LIST
 from datetime import datetime, timedelta
 from typing import Union, Dict
