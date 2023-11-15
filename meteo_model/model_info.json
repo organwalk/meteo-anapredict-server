@@ -2,6 +2,6 @@
   "version": "#31013202902C",
   "cn_des": "信创技术下气象数据预测模型",
   "technology": "基于TensorFlow构建预测模型",
-  "support": "短期(24 H)LSTM、长期(7 DAYS)LSTM",
+  "support": "短期 ( 24 H ) LSTM、长期 ( 7 DAYS ) LSTM",
   "update": "2023-10-13"
 }

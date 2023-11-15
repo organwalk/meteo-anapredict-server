@@ -17,10 +17,10 @@ _MYSQL_CONFIG = {
 
 
 REDIS_CONFIG = {
-    'host': 'localhost',
-    'port': '36379',
+    'host': 'organwalk.ink',
+    'port': '26379',
     'db': '1',
-    'password': '123456'
+    'password': 'organwalk@redis.123456'
 }
 
 
