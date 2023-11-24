@@ -19,7 +19,7 @@ _MYSQL_CONFIG = {
 REDIS_CONFIG = {
     'host': 'localhost',
     'port': '6379',
-    'db': '1',
+    'db': '2',
     'password': '123456'
 }
 

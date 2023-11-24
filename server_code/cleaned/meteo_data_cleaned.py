@@ -3,7 +3,28 @@ from config import FILE_PATH
 import redis
 from server_code.application import REDIS_CONFIG
 import csv
+import os
 from datetime import datetime, timedelta
+
+
+def get_latest_date(station: str):
+    folder_path = FILE_PATH + station
+    if not os.path.exists(folder_path) or not os.path.isdir(folder_path):
+        return ""  # 返回空字符串，路径或文件夹不存在
+
+    files = os.listdir(folder_path)
+    if not files:
+        return ""  # 返回空字符串，文件夹为空
+
+    latest_date = ""
+    for file_name in files:
+        file_path = os.path.join(folder_path, file_name)
+        if os.path.isfile(file_path) and file_name.endswith(".csv"):
+            date_str = file_name.split("_")[2].split(".")[0]
+            if date_str > latest_date:
+                latest_date = date_str
+
+    return latest_date
 
 
 def etl_data(station: str, start_date: str, end_date: str):

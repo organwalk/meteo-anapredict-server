@@ -10,7 +10,7 @@ import entity.req_entity as server_req
 from utils import req_utils
 from service import analyze_service
 from service.prediction_service import predict_by_model
-from cleaned.meteo_data_cleaned import etl_data
+from cleaned.meteo_data_cleaned import etl_data, get_latest_date
 
 app = Flask(__name__)
 
@@ -45,6 +45,15 @@ def _api_model_report() -> Response:
         return result.success('获取模型报告成功', report) if report else result.not_found('暂无报告')
     else:
         return result.fail_entity(validate)
+
+
+@app.route('/anapredict/latest_date', methods=['POST'])
+def _api_cleaned_latest_date() -> Response:
+    latest = get_latest_date(**request.get_json())
+    if latest:
+        return result.success('已成功获取最近清洗数据日期', latest)
+    else:
+        return result.fail_entity("未能获取最近清洗数据日期")
 
 
 @app.route('/anapredict/cleaned', methods=['POST'])
