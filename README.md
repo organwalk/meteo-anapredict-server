@@ -25,7 +25,7 @@
 本项目运行于python 3.6，推荐使用虚拟环境搭建此python版本。使用以下命令安装依赖项：
 
 ```
-pip install -r requement.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
+pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
 ```
 
 ## 数据集
